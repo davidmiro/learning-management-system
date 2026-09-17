@@ -1,0 +1,209 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-teachers
+      author: david
+      changes:
+        - createTable:
+            tableName: teachers
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 001-create-groups
+      author: david
+      changes:
+        - createTable:
+            tableName: groups
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: group_name
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: 001-create-students
+      author: david
+      changes:
+        - createTable:
+            tableName: students
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 001-create-courses
+      author: david
+      changes:
+        - createTable:
+            tableName: course
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: course_name
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: VARCHAR(1000)
+              - column:
+                  name: teacher_id
+                  type: BIGINT
+        - addForeignKeyConstraint:
+            baseTableName: course
+            baseColumnNames: teacher_id
+            referencedTableName: teachers
+            referencedColumnNames: id
+            constraintName: fk_course_teacher
+
+  - changeSet:
+      id: 001-create-schedule
+      author: david
+      changes:
+        - createTable:
+            tableName: schedule
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: BIGINT
+              - column:
+                  name: teacher_id
+                  type: BIGINT
+              - column:
+                  name: course_id
+                  type: BIGINT
+              - column:
+                  name: start_date_time
+                  type: TIMESTAMP
+              - column:
+                  name: end_date_time
+                  type: TIMESTAMP
+        - addForeignKeyConstraint:
+            baseTableName: schedule
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_schedule_group
+        - addForeignKeyConstraint:
+            baseTableName: schedule
+            baseColumnNames: teacher_id
+            referencedTableName: teachers
+            referencedColumnNames: id
+            constraintName: fk_schedule_teacher
+        - addForeignKeyConstraint:
+            baseTableName: schedule
+            baseColumnNames: course_id
+            referencedTableName: course
+            referencedColumnNames: id
+            constraintName: fk_schedule_course
+
+  - changeSet:
+      id: 001-create-student-group
+      author: david
+      changes:
+        - createTable:
+            tableName: student_group
+            columns:
+              - column:
+                  name: student_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: student_group
+            columnNames: student_id, group_id
+            constraintName: pk_student_group
+        - addForeignKeyConstraint:
+            baseTableName: student_group
+            baseColumnNames: student_id
+            referencedTableName: students
+            referencedColumnNames: id
+            constraintName: fk_student_group_student
+        - addForeignKeyConstraint:
+            baseTableName: student_group
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_student_group_group
+
+  - changeSet:
+      id: 001-create-course-group
+      author: david
+      changes:
+        - createTable:
+            tableName: course_group
+            columns:
+              - column:
+                  name: course_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: course_group
+            columnNames: course_id, group_id
+            constraintName: pk_course_group
+        - addForeignKeyConstraint:
+            baseTableName: course_group
+            baseColumnNames: course_id
+            referencedTableName: course
+            referencedColumnNames: id
+            constraintName: fk_course_group_course
+        - addForeignKeyConstraint:
+            baseTableName: course_group
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_course_group_group
