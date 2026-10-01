@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -24,8 +25,8 @@ public class Group {
     private List<Student> students;
 
     @OneToMany(mappedBy = "group")
-    private List <Schedule> schedule;
+    private List <Schedule> schedules;
 
-    @ManyToMany(mappedBy = "groups")
-    private List<Course> courses;
+    @OneToMany(mappedBy = "group")
+    private List<CourseGroup> courseGroups = new ArrayList<>();
 }

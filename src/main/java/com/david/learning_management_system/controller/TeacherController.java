@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/teachers")
+@RequestMapping("/v1/teachers")
 @RequiredArgsConstructor
 public class TeacherController {
     private final TeacherService teacherService;
@@ -41,5 +41,4 @@ public class TeacherController {
         teacherService.deleteTeacherById(id);
         return ResponseEntity.noContent().build();
     }
-
 }

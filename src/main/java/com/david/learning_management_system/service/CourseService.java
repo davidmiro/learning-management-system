@@ -5,8 +5,10 @@ import com.david.learning_management_system.dto.request.CourseUpdateDto;
 import com.david.learning_management_system.dto.response.CourseResponseDto;
 import com.david.learning_management_system.mapper.CourseMapper;
 import com.david.learning_management_system.model.Course;
+import com.david.learning_management_system.model.CourseGroup;
 import com.david.learning_management_system.model.Group;
 import com.david.learning_management_system.model.Teacher;
+import com.david.learning_management_system.repository.CourseGroupRepository;
 import com.david.learning_management_system.repository.CourseRepository;
 import com.david.learning_management_system.repository.GroupRepository;
 import com.david.learning_management_system.repository.TeacherRepository;
@@ -23,7 +25,9 @@ public class CourseService {
     private final GroupRepository groupRepository;
     private final TeacherRepository teacherRepository;
     private final CourseMapper courseMapper;
+    private final CourseGroupRepository courseGroupRepository;
 
+    @Transactional(readOnly = true)
     public CourseResponseDto getCourseById(Long id) {
         return courseMapper.toResponse(courseRepository.findCourseByIdOrThrow(id));
     }
@@ -42,9 +46,12 @@ public class CourseService {
 
     @Transactional
     public CourseResponseDto updateCourse(Long id, CourseUpdateDto dto) {
+        if (dto.courseName() == null && dto.description() == null &&dto.teacherId() == null) {
+            throw new IllegalArgumentException("At least one field must be provided for update");
+        }
 
         Course existingCourse = courseRepository.findCourseByIdOrThrow(id);
-        courseMapper.updateFromDto(existingCourse, dto);
+        courseMapper.updateFromDto(dto, existingCourse);
 
         if (dto.teacherId() != null) {
             Teacher teacher = teacherRepository.findTeacherByIdOrThrow(dto.teacherId());
@@ -67,11 +74,13 @@ public class CourseService {
         Group group = groupRepository.findGroupByIdOrThrow(groupId);
         Course course = courseRepository.findCourseByIdOrThrow(courseId);
 
-        if (course.getGroups().contains(group)) {
+        if (courseGroupRepository.existsByCourseIdAndGroupId(courseId, groupId)) {
             throw new IllegalArgumentException("Group already in this course");
         }
-        course.getGroups().add(group);
-        courseRepository.save(course);
+        CourseGroup courseGroup = new CourseGroup();
+        courseGroup.setCourse(course);
+        courseGroup.setGroup(group);
+        courseGroupRepository.save(courseGroup);
 
         return courseMapper.toResponse(course);
     }
@@ -79,10 +88,9 @@ public class CourseService {
     @Transactional
     public void deleteGroupFromCourse(Long courseId, Long groupId) {
 
-        Group group = groupRepository.findGroupByIdOrThrow(groupId);
-        Course course = courseRepository.findCourseByIdOrThrow(courseId);
-
-        course.getGroups().remove(group);
-        courseRepository.save(course);
+        CourseGroup courseGroup = courseGroupRepository.
+                findByCourseIdAndGroupId(courseId, groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Group is not linked to this course"));
+        courseGroupRepository.delete(courseGroup);
     }
 }

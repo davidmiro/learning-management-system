@@ -1,10 +1,14 @@
 package com.david.learning_management_system.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "teachers")
 public class Teacher {

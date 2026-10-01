@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/groups")
+@RequestMapping("/v1/groups")
 @RequiredArgsConstructor
 
 public class GroupController {
@@ -22,7 +22,6 @@ public class GroupController {
     public ResponseEntity<GroupResponseDto> getGroupById(@PathVariable Long id) {
         return ResponseEntity.ok(groupService.getGroupById(id));
     }
-
 
     @PostMapping
     public ResponseEntity<GroupResponseDto> createGroup(@Valid @RequestBody GroupCreateDto createDto) {
@@ -54,5 +53,4 @@ public class GroupController {
         groupService.deleteStudentFromGroup(studentId, groupId);
         return ResponseEntity.noContent().build();
     }
-
 }

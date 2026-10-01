@@ -1,23 +1,13 @@
 spring:
   application:
     name: learning-management-system
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-
-  datasource:
-    url: jdbc:postgresql://localhost:5432/lms
-    username: lms
-    password: lms
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+jpa:
+  open-in-view: false
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
+
+server:
+  servlet:
+    context-path: /lms
