@@ -39,6 +39,8 @@ databaseChangeLog:
               - column:
                   name: group_name
                   type: VARCHAR(255)
+                  constraints:
+                    nullable: false
 
   - changeSet:
       id: 001-create-students
@@ -80,12 +82,18 @@ databaseChangeLog:
               - column:
                   name: course_name
                   type: VARCHAR(255)
+                  constraints:
+                    nullable: false
               - column:
                   name: description
                   type: VARCHAR(1000)
+                  constraints:
+                    nullable: false
               - column:
                   name: teacher_id
                   type: BIGINT
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableName: course
             baseColumnNames: teacher_id
@@ -109,18 +117,28 @@ databaseChangeLog:
               - column:
                   name: group_id
                   type: BIGINT
+                  constraints:
+                    nullable: false
               - column:
                   name: teacher_id
                   type: BIGINT
+                  constraints:
+                    nullable: false
               - column:
                   name: course_id
                   type: BIGINT
+                  constraints:
+                    nullable: false
               - column:
                   name: start_date_time
                   type: TIMESTAMP
+                  constraints:
+                    nullable: false
               - column:
                   name: end_date_time
                   type: TIMESTAMP
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableName: schedule
             baseColumnNames: group_id
@@ -182,6 +200,12 @@ databaseChangeLog:
             tableName: course_group
             columns:
               - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
                   name: course_id
                   type: BIGINT
                   constraints:
@@ -191,10 +215,10 @@ databaseChangeLog:
                   type: BIGINT
                   constraints:
                     nullable: false
-        - addPrimaryKey:
+        - addUniqueConstraint:
             tableName: course_group
             columnNames: course_id, group_id
-            constraintName: pk_course_group
+            constraintName: uk_course_group
         - addForeignKeyConstraint:
             baseTableName: course_group
             baseColumnNames: course_id

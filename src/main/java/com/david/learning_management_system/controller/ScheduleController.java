@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/schedules")
+@RequestMapping("/v1/schedules")
 @RequiredArgsConstructor
 public class ScheduleController {
 
