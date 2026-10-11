@@ -8,15 +8,15 @@ import com.david.learning_management_system.model.Course;
 import com.david.learning_management_system.model.Group;
 import com.david.learning_management_system.model.Schedule;
 import com.david.learning_management_system.model.Teacher;
-import com.david.learning_management_system.repository.CourseRepository;
-import com.david.learning_management_system.repository.GroupRepository;
-import com.david.learning_management_system.repository.ScheduleRepository;
-import com.david.learning_management_system.repository.TeacherRepository;
+import com.david.learning_management_system.repository.*;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.ObjectUtils.allNotNull;
 
 
 @Service
@@ -28,6 +28,7 @@ public class ScheduleService {
     private final GroupRepository groupRepository;
     private final CourseRepository courseRepository;
     private final TeacherRepository teacherRepository;
+    private final CourseGroupRepository courseGroupRepository;
 
     public ScheduleResponseDto getScheduleById(Long id) {
 
@@ -40,16 +41,15 @@ public class ScheduleService {
         Group group = groupRepository.findGroupByIdOrThrow(scheduleCreateDto.groupId());
         Course course = courseRepository.findCourseByIdOrThrow(scheduleCreateDto.courseId());
 
-        Teacher teacher = course.getTeacher();
+        Teacher teacher = ofNullable(course.getTeacher())
+                .orElseThrow(() -> new IllegalArgumentException("Course has no teacher, cannot create schedule"));
 
         Schedule schedule = scheduleMapper.toEntity(scheduleCreateDto);
 
-        if (!course.getGroups().contains(group)) {
+        if (!courseGroupRepository.existsByCourseIdAndGroupId(
+                scheduleCreateDto.courseId(),
+                scheduleCreateDto.groupId())) {
             throw new IllegalArgumentException("Group is not assigned to this course, cannot create schedule");
-        }
-
-        if (teacher == null) {
-            throw new IllegalArgumentException("Course has no teacher, cannot create schedule");
         }
 
         schedule.setGroup(group);
@@ -59,12 +59,13 @@ public class ScheduleService {
         return scheduleMapper.toResponse(scheduleRepository.save(schedule));
     }
 
+    @Transactional
     public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateDto dto) {
 
         Schedule existingSchedule = scheduleRepository.findScheduleByIdOrThrow(id);
 
-        if (dto.startDateTime() != null && dto.endDateTime() != null
-        && !dto.startDateTime().isBefore(dto.endDateTime())) {
+        if (allNotNull(dto.startDateTime(), dto.endDateTime())
+                && dto.startDateTime().isAfter(dto.endDateTime())) {
             throw new IllegalArgumentException("Start date must be before end date");
         }
 

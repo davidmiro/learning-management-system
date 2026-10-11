@@ -3,6 +3,8 @@ package com.david.learning_management_system.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "course")
+@SQLDelete(sql = "UPDATE course SET deleted = true WHERE id =?")
+@SQLRestriction("deleted = false")
 public class Course {
 
     @Id
@@ -27,11 +31,10 @@ public class Course {
     private Teacher teacher;
 
     @OneToMany(mappedBy = "course")
-    private List <Schedule> schedules;
+    private List<Schedule> schedules;
 
-    @ManyToMany
-    @JoinTable(name = "course_group",
-            joinColumns = @JoinColumn(name = "course_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id"))
-    private List<Group> groups = new ArrayList<>();
+    private boolean deleted = Boolean.FALSE;
+
+    @OneToMany(mappedBy = "course")
+    private List<CourseGroup> courseGroups = new ArrayList<>();
 }

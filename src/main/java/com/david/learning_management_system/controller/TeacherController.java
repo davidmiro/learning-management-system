@@ -12,34 +12,33 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/teachers")
+@RequestMapping("/teachers")
 @RequiredArgsConstructor
 public class TeacherController {
     private final TeacherService teacherService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/v1/{id}")
     public ResponseEntity<TeacherResponseDto> getTeacherById(@PathVariable Long id) {
 
         return ResponseEntity.ok(teacherService.getTeacherById(id));
     }
 
-    @PostMapping
+    @PostMapping("/v1/")
     public ResponseEntity<TeacherResponseDto> createTeacher(@Valid @RequestBody TeacherCreateDto createDto) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(teacherService.createTeacher(createDto));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/v1/{id}")
     public ResponseEntity<TeacherResponseDto> updateTeacher(@PathVariable Long id,
                                                             @Valid @RequestBody TeacherUpdateDto updateDto) {
         return ResponseEntity.ok(teacherService.updateTeacher(id, updateDto));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/v1/{id}")
     public ResponseEntity<Void> deleteTeacher(@PathVariable Long id) {
 
         teacherService.deleteTeacherById(id);
         return ResponseEntity.noContent().build();
     }
-
 }
